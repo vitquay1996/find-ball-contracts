@@ -1,7 +1,22 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+library SafeMath { 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+      assert(b <= a);
+      return a - b;
+    }
+    
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+      uint256 c = a + b;
+      assert(c >= a);
+      return c;
+    }
+}
+
 contract GameCoin {
+    
+    using SafeMath for uint256;
 
     bool public mintingFinished = false;
     
@@ -45,8 +60,8 @@ contract GameCoin {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
-        balances[msg.sender] -= _value;
-        balances[_to] += _value;
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
 
         emit Transfer(msg.sender, _to, _value);
         return true;
@@ -63,9 +78,9 @@ contract GameCoin {
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
 
-        balances[_from] -= _value;
-        balances[_to] += _value;
-        allowed[_from][msg.sender] -= _value;
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
         emit Transfer(_from, _to, _value);
         return true;
@@ -104,8 +119,8 @@ contract GameCoin {
     * @return A boolean that indicates if the operation was successful.
     */
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
-        totalSupply_ += _amount;
-        balances[_to] += _amount;
+        totalSupply_ = totalSupply_.add(_amount);
+        balances[_to] = balances[_to].add(_amount);
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
         return true;
