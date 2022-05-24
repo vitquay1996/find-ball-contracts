@@ -15,6 +15,8 @@
 
             async function main() {
                 provider = new ethers.providers.Web3Provider(window.ethereum)
+                window.provider = provider
+                window.ethers = ethers
                 await provider.send("eth_requestAccounts", []);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
@@ -23,13 +25,13 @@
                 await checkBalance();
 
                 // Our contract
-                var gameMasterAddress = '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512';
-                var gameMasterABI = [{"inputs":[{"internalType":"uint256","name":"_entryCommission","type":"uint256"},{"internalType":"contract BallBoard","name":"ballBoardContractAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"endGame","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getContractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getEntryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGameRunning","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getNumPlayers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getPrizePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getWinner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numCups","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"uint8","name":"playerGuess","type":"uint8"}],"name":"play","outputs":[{"internalType":"bool","name":"isGuessCorrect","type":"bool"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"newEntryCost","type":"uint256"}],"name":"startGame","outputs":[{"internalType":"uint256","name":"newGameId","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+                var gameMasterAddress = '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9';
+                var gameMasterABI = [{"inputs":[{"internalType":"contract BallBoard","name":"ballBoardContractAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"contractOwnerCommission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"entryCommission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"entryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint256","name":"prizePool","type":"uint256"},{"internalType":"uint256","name":"numPlayers","type":"uint256"},{"internalType":"bool","name":"isGameRunning","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getContractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getEntryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGameRunning","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getNumPlayers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getPrizePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numCups","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numOfRunningGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"playerGuess","type":"uint8"}],"name":"play","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerList","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
                 gameMasterContract = new ethers.Contract(gameMasterAddress, gameMasterABI, signer);
                 window.gameMasterContract = gameMasterContract;
 
-                var gameBoardAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+                var gameBoardAddress = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
                 var gameBoardABI = [{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newBoardId","type":"uint256"}],"name":"boardCreated","type":"event"},{"inputs":[{"internalType":"uint8","name":"size","type":"uint8"}],"name":"createBoard","outputs":[{"internalType":"uint256","name":"newBoardId","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"}],"name":"getBallBoard","outputs":[{"internalType":"bool[]","name":"","type":"bool[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"}],"name":"getRevealBoard","outputs":[{"internalType":"bool[]","name":"","type":"bool[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint8","name":"location","type":"uint8"}],"name":"isRevealed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numBoards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint8","name":"location","type":"uint8"}],"name":"revealCup","outputs":[{"internalType":"bool","name":"isBall","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]
                 gameBoardContract = new ethers.Contract(gameBoardAddress, gameBoardABI, signer);
                 window.gameBoardContract = gameBoardContract;
@@ -37,7 +39,7 @@
                 // Test actions
                 //await startGame(100000000);
                 //play(0,0,"3");
-                await getGameReveal(0);
+                //await getGameReveal(0);
 
                 let prizePool = await gameMasterContract.getPrizePool(0);
                 console.log(`Prize Pool: ${ethers.utils.formatEther(prizePool.toString())}`);
@@ -50,27 +52,11 @@
                 console.log("Check Balance: "+balance);
             }
 
-            async function startGame(entryCommission) {
-                const startGame1 = await gameMasterContract.startGame(entryCommission, {value: ethers.utils.parseEther("0.5")})
-                const receipt = await startGame1.wait();
-                console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
-                console.log(receipt);
-                console.log("Game Id: " + receipt.logs[0].data);
-            }
-
-            async function play(id, guess, betAmount) {
-                const playGuess = await gameMasterContract.play(id,guess,{value: ethers.utils.parseEther(betAmount)})
+            async function play(guess, betAmount) {
+                const playGuess = await gameMasterContract.play(guess,{value: ethers.utils.parseEther(betAmount)})
                 const receipt = await playGuess.wait();
                 console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
                 console.log(receipt);
-            }
-
-            async function endGame(id) {
-                const endGame = await gameMasterContract.endGame(id);
-                const receipt = await endGame.wait();
-                console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
-                console.log(receipt);
-                checkBalance();
             }
             
             async function getGameReveal(id) {
@@ -83,23 +69,15 @@
                 console.log(gameBoard)
             }
 
-            async function getGameStatus(id) {
-                const isGameRunning = await gameMasterContract.getGameRunning(id);
-                console.log("Game " + id + " status is " + isGameRunning);
-                document.getElementById("gameStatus").innerHTML = isGameRunning.toString();
-            }
-
             // Buttons
             document.getElementById("checkBalanceButton").onclick = async () => {
                 await checkBalance()
             }
             document.getElementById("playButton").onclick = async () => {
-                var gameID = document.getElementById("gameIdInput").value
                 var guess = document.getElementById("guessInput").value
                 var bet = document.getElementById("betInput").value
-                console.log("GameID: " + gameID + "; guess: " + guess + "; bet: " + bet)
-                await play(gameID, guess, bet)
-                await getGameReveal(gameID)
+                console.log("guess: " + guess + "; bet: " + bet)
+                await play(guess, bet)
                 await checkBalance()
             }
             document.getElementById("checkBall").onclick = async () => {
@@ -110,14 +88,7 @@
                 var gameID = document.getElementById("gameIdInput").value
                 await getGameReveal(gameID)
             }
-            document.getElementById("endGame").onclick = async () => {
-                var gameID = document.getElementById("gameIdInput").value
-                await endGame(gameID);
-            }
-            document.getElementById("gameIdInput").onchange = async () => {
-                var gameID = document.getElementById("gameIdInput").value
-                await getGameStatus(gameID)
-            }
+
 
             main()
                 .then()
@@ -131,14 +102,12 @@
         <div>Account: <a id="account">Loading</a></div>
         <div>Balance: <a id="balance">Loading</a></div>
         <label>Game ID:</label><input id="gameIdInput"></br>
-        <div>IsGameRunning: <a id="gameStatus">Loading</a></div>
         <label>Guess:</label><input id="guessInput"></br>
         <label>Bet:</label><input id="betInput"></br>
         <button id="playButton">Play</button>
         <button id="checkBalanceButton">Check Balance</button>
         <button id="checkReveal">Check Reveal Board</button>
         <button id="checkBall">Check Ball Board</button>
-        <button id="endGame">End Game</button>
     </body>
 </html>
 

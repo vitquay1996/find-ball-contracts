@@ -88,7 +88,7 @@ contract GameMaster {
 
     // main function to participate
     function play(uint8 playerGuess) public payable returns(uint256 gameId) {
-        require (msg.value == entryCost, "Play: entry cost not met");
+        require (msg.value >= entryCost, "Play: entry cost not met");
         require (msg.sender != contractOwner, "Play: Owner cannot play");
         require (playerList[msg.sender] == false, "Play: player is already playing");
 
