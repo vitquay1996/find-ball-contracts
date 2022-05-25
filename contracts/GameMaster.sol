@@ -11,11 +11,14 @@ contract GameMaster {
     Queue.Uint256Queue runningGameQueue;
     BallBoard ballBoardContract;
    
+    event newGameID (uint256 newGameId);
+    event gameover (uint256 gameId);
 
     struct Game {
         uint256 boardId;
         uint256 prizePool;
         uint256 numPlayers;
+        uint256 numWinners;
         bool isGameRunning;
 
         address[] _playerList;
@@ -27,10 +30,10 @@ contract GameMaster {
 
     address contractOwner;
     uint8 public numCups = 8;
-    uint256 public entryCommission;
     uint256 public entryCost;
     uint256 public numOfRunningGames;
     uint256 public contractOwnerCommission;
+    uint256 public prizePool;
 
     constructor(BallBoard ballBoardContractAddress) {
         // fixed entryCost for simplicity
@@ -64,12 +67,14 @@ contract GameMaster {
 
         if (numOfWinners == 0) {
             // TODO: Rollover some pot
-            // if number of winners == 0, 100% of the prize pool is kept as commission
-            contractOwnerCommission += games[gameId].prizePool;
+            // if number of winners == 0, 10% of the prize pool is kept as commission
+            contractOwnerCommission += games[gameId].prizePool / 10;
+            prizePool += games[gameId].prizePool;
         } else {
             // if number of winners > 0, prize pool divded evenly among winners
             // insecure divide
-            uint256 prize = games[gameId].prizePool / numOfWinners; 
+            uint256 prize = prizePool / numOfWinners; 
+            prizePool = 0;
             for (uint256 i = 0; i < numOfWinners; i++) {
                 address payable winner = payable(games[gameId].winnerList[i]);
                 winner.transfer(prize);
@@ -83,7 +88,9 @@ contract GameMaster {
             address player = games[gameId]._playerList[i];
             playerList[player] = false;
         }
-        delete games[gameId];
+        //delete games[gameId];
+
+        emit gameover(gameId);
     }
 
     // main function to participate
@@ -93,11 +100,11 @@ contract GameMaster {
         require (playerList[msg.sender] == false, "Play: player is already playing");
 
         // find instance
-        if (runningGameQueue.isEmpty() == true) {
+        if (runningGameQueue.isEmpty() == true || games[runningGameQueue.peekLast()].isGameRunning == false ) {
             gameId = startGame();
             runningGameQueue.enqueue(gameId);
         } else {
-            gameId = runningGameQueue.peek();
+            gameId = runningGameQueue.peekLast();
         }
         require(games[gameId].isGameRunning == true, "Play: game is not running");
 
@@ -110,20 +117,40 @@ contract GameMaster {
         // play game
         bool isGuessCorrect = ballBoardContract.revealCup(games[gameId].boardId, playerGuess);
         if (isGuessCorrect == true) {
+            games[gameId].numWinners++;
             games[gameId].winnerList.push(msg.sender);        
         } 
   
         // TODO: potential race condition?
         if (games[gameId].numPlayers == 4) {
             games[gameId].isGameRunning = false;
-            uint256 endingGameId = runningGameQueue.dequeue();
-            require (endingGameId == gameId, "Play: temp throw");
+            //uint256 endingGameId = runningGameQueue.dequeue();
+            //require (endingGameId == gameId, "Play: temp throw");
             endGame(gameId);
         }
+
+        emit newGameID(gameId);
     }
 
-    function getPrizePool(uint256 gameId) public view returns(uint256) {
-        return games[gameId].prizePool;
+    function getQueuePeek() public view returns(uint256) {
+        return runningGameQueue.peek();
+    }
+
+    function isQueueEmpty() public view returns(bool) {
+        return runningGameQueue.isEmpty();
+    }
+
+    function getNumWinners(uint256 gameId) public view returns(uint256) {
+        return games[gameId].numWinners;
+    }
+
+    function getWinner(uint256 gameId, uint256 position) public view returns(address) {
+        return games[gameId].winnerList[position];
+    }
+
+    function getPrizePool() public view returns(uint256) {
+        console.log("here %s",prizePool);
+        return prizePool;
     }
 
     //TODO: Check logic
