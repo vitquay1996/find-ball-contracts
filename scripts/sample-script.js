@@ -22,7 +22,7 @@ async function main() {
   console.log("BallBoard deployed to:", ballBoard.address);
 
   const GameMaster = await hre.ethers.getContractFactory("GameMaster");
-  const gameMaster = await GameMaster.deploy(1000000000000,ballBoard.address);
+  const gameMaster = await GameMaster.deploy(ballBoard.address);
 
   await gameMaster.deployed();
   console.log("GameMaster deployed to:", gameMaster.address);
