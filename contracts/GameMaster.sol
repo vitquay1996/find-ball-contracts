@@ -4,12 +4,13 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "./BallBoard.sol";
 import "./Queue.sol";
-
+import "./GameCoin.sol";
 
 contract GameMaster {
     using Queue for Queue.Uint256Queue;
     Queue.Uint256Queue runningGameQueue;
     BallBoard ballBoardContract;
+    GameCoin gameCoinContract;
    
     event newGameID (uint256 newGameId);
     event gameover (uint256 gameId);
@@ -35,12 +36,13 @@ contract GameMaster {
     uint256 public contractOwnerCommission;
     uint256 public prizePool;
 
-    constructor(BallBoard ballBoardContractAddress) {
+    constructor(BallBoard ballBoardContractAddress, GameCoin gameCoinContractAddress) {
         // fixed entryCost for simplicity
         // 10000000000000 Wei / 0.00001 Ether
         // Queue implementation always added a 0 so dequeued
-        entryCost = 10000000000000;
+        entryCost = 5;
         ballBoardContract = ballBoardContractAddress;
+        gameCoinContract = gameCoinContractAddress;
         runningGameQueue.dequeue();
     }
 
@@ -68,7 +70,7 @@ contract GameMaster {
         if (numOfWinners == 0) {
             // TODO: Rollover some pot
             // if number of winners == 0, 10% of the prize pool is kept as commission
-            contractOwnerCommission += games[gameId].prizePool / 10;
+            //contractOwnerCommission += games[gameId].prizePool / 10;
             prizePool += games[gameId].prizePool;
         } else {
             // if number of winners > 0, prize pool divded evenly among winners
@@ -76,8 +78,10 @@ contract GameMaster {
             uint256 prize = prizePool / numOfWinners; 
             prizePool = 0;
             for (uint256 i = 0; i < numOfWinners; i++) {
-                address payable winner = payable(games[gameId].winnerList[i]);
-                winner.transfer(prize);
+                // address payable winner = payable(games[gameId].winnerList[i]);
+                // winner.transfer(prize);
+                address winner = games[gameId].winnerList[i];
+                gameCoinContract.transfer(winner, prize);
             }
 
         }
@@ -94,10 +98,12 @@ contract GameMaster {
     }
 
     // main function to participate
-    function play(uint8 playerGuess) public payable returns(uint256 gameId) {
-        require (msg.value >= entryCost, "Play: entry cost not met");
-        require (msg.sender != contractOwner, "Play: Owner cannot play");
+    function play(uint8 playerGuess) public returns(uint256 gameId) {
+        //require (msg.value >= entryCost, "Play: entry cost not met");
+        //require (msg.sender != contractOwner, "Play: Owner cannot play");
         require (playerList[msg.sender] == false, "Play: player is already playing");
+
+        gameCoinContract.transferFrom(msg.sender, address(this), entryCost);
 
         // find instance
         if (runningGameQueue.isEmpty() == true || games[runningGameQueue.peekLast()].isGameRunning == false ) {
@@ -110,7 +116,7 @@ contract GameMaster {
 
         // game logistics
         games[gameId].numPlayers++;
-        games[gameId].prizePool += msg.value;
+        games[gameId].prizePool += entryCost;
         games[gameId]._playerList.push(msg.sender);
         playerList[msg.sender] = true;
 

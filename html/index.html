@@ -11,6 +11,7 @@
             var userAddress;
             var gameMasterContract;
             var gameBoardContract;
+            var gameCoinContract;
             var provider;
             var signer;
 
@@ -22,12 +23,12 @@
                 window.userAddress = userAddress;
                 document.getElementById("account").innerText = userAddress;
 
-                await checkBalance();
+                //await checkBalance();
 
                 // Our contract
-                var gameMasterAddress = '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512';
-                var gameMasterABI = [{"inputs":[{"internalType":"contract BallBoard","name":"ballBoardContractAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"gameover","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newGameId","type":"uint256"}],"name":"newGameID","type":"event"},{"inputs":[],"name":"contractOwnerCommission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"entryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint256","name":"prizePool","type":"uint256"},{"internalType":"uint256","name":"numPlayers","type":"uint256"},{"internalType":"uint256","name":"numWinners","type":"uint256"},{"internalType":"bool","name":"isGameRunning","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getContractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getEntryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGameRunning","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getNumPlayers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getNumWinners","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPrizePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getQueuePeek","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"uint256","name":"position","type":"uint256"}],"name":"getWinner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"isQueueEmpty","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numCups","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numOfRunningGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"playerGuess","type":"uint8"}],"name":"play","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerList","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"prizePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
-
+                var gameMasterAddress = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
+                window.gameMasterAddress = gameMasterAddress;
+                var gameMasterABI = [{"inputs":[{"internalType":"contract BallBoard","name":"ballBoardContractAddress","type":"address"},{"internalType":"contract GameCoin","name":"gameCoinContractAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"gameover","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newGameId","type":"uint256"}],"name":"newGameID","type":"event"},{"inputs":[],"name":"contractOwnerCommission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"entryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint256","name":"prizePool","type":"uint256"},{"internalType":"uint256","name":"numPlayers","type":"uint256"},{"internalType":"uint256","name":"numWinners","type":"uint256"},{"internalType":"bool","name":"isGameRunning","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getContractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getEntryCost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGameRunning","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getNumPlayers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getNumWinners","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPrizePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getQueuePeek","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"uint256","name":"position","type":"uint256"}],"name":"getWinner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"isQueueEmpty","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numCups","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numOfRunningGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"playerGuess","type":"uint8"}],"name":"play","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerList","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"prizePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
                 gameMasterContract = new ethers.Contract(gameMasterAddress, gameMasterABI, signer);
                 window.gameMasterContract = gameMasterContract;
 
@@ -35,6 +36,11 @@
                 var gameBoardABI = [{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"newBoardId","type":"uint256"}],"name":"boardCreated","type":"event"},{"inputs":[{"internalType":"uint8","name":"size","type":"uint8"}],"name":"createBoard","outputs":[{"internalType":"uint256","name":"newBoardId","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"}],"name":"getBallBoard","outputs":[{"internalType":"bool[]","name":"","type":"bool[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"}],"name":"getRevealBoard","outputs":[{"internalType":"bool[]","name":"","type":"bool[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint8","name":"location","type":"uint8"}],"name":"isRevealed","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"numBoards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"boardId","type":"uint256"},{"internalType":"uint8","name":"location","type":"uint8"}],"name":"revealCup","outputs":[{"internalType":"bool","name":"isBall","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]
                 gameBoardContract = new ethers.Contract(gameBoardAddress, gameBoardABI, signer);
                 window.gameBoardContract = gameBoardContract;
+
+                var gameCoinAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+                var gameCoinABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[],"name":"MintFinished","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"address","name":"_spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"finishMinting","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"mint","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"mintingFinished","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_from","type":"address"},{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]
+                gameCoinContract = new ethers.Contract(gameCoinAddress, gameCoinABI, signer);
+                window.gameCoinContract = gameCoinContract;
 
                 // Events
                 let newGameFilter = {
@@ -72,13 +78,13 @@
             }
 
             async function checkBalance() {
-                let balance = await provider.getBalance(userAddress);
-                balance = ethers.utils.formatEther(balance);
-                console.log("Check Balance: "+balance);
+                let balance = await gameCoinContract.balanceOf(userAddress)
+                document.getElementById("balance").innerHTML = balance.toString();
+                console.log("Check Balance: "+balance.toString());
             }
 
-            async function play(guess, betAmount) {
-                const playGuess = await gameMasterContract.play(guess, {value: ethers.utils.parseEther(betAmount)})
+            async function play(guess) {
+                const playGuess = await gameMasterContract.play(guess)
                 const receipt = await playGuess.wait();
                 console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
                 console.log(receipt);
@@ -105,6 +111,7 @@
                 const loadRevealed = await getGameReveal(id);
   
                 await prizePoolRefresh();
+                await checkBalance();
 
                 if (isGameRunning == false) {
                     let numWinners = await gameMasterContract.getNumWinners(id);
@@ -132,13 +139,13 @@
             async function playerSelectedCup(num) {
                 let entryCost = await gameMasterContract.getEntryCost();
                 console.log("Entry cost is: " + entryCost.toString());
-                await play(num, ethers.utils.formatEther(entryCost.toString()));
+                await play(num);
             }
 
             async function prizePoolRefresh() {
                 let prizePool = await gameMasterContract.getPrizePool();
                 console.log(prizePool.toString());
-                document.getElementById("pot").innerHTML = ethers.utils.formatEther(prizePool.toString());
+                document.getElementById("pot").innerHTML = prizePool.toString();
             }
 
             document.getElementById("cup1").onclick = async () => {
@@ -173,6 +180,9 @@
                 await playerSelectedCup(7);
             }
 
+            document.getElementById("approve").onclick = async () => {
+                await gameCoinContract.approve(window.gameMasterAddress,1000);
+            }
             main()
                 .then()
                 .catch((error) => {
@@ -182,8 +192,9 @@
         </script>
     </head>
     <body>
-        <div>Account: <a id="account">Loading</a></div><br><br><br>
-        <div id="divpot">Pot Money: <span id="pot">0</span> ETH</div><br><br>
+        <div>Account: <a id="account">Loading</a></div>
+        <div>Balance: <a id="balance">Loading</a></div><br><br><br>
+        <div id="divpot">Pot Money: <span id="pot">0</span> GCN</div><br><br>
         <div id="game">
             <img class="cup" src="images/cup.png" id="cup1">
             <img class="cup" src="images/cup.png" id="cup2">
@@ -197,7 +208,7 @@
             <div id="game-result"></div>
         </div>
         <br><br><br><br><div>Click a cup to guess the ball's position</div><br><br>
-        <div id="winner" style="display: none;">Winner: </div><br>
+        <div id="winner" style="display: none;">Winner: </div><br><button id="approve">Approve</button>
     </body>
 </html>
 
